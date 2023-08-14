@@ -21,8 +21,9 @@ defmodule Fortune.Strfile do
 
   def read_string(strfile, index) do
     offset_size = strfile.header.word_size
+    offset_size_bits = strfile.header.word_size * 8
 
-    with {:ok, <<offset::size(offset_size * 8)>>} <-
+    with {:ok, <<offset::size(offset_size_bits)>>} <-
            pread(strfile.io, strfile.header.length + index * offset_size, offset_size),
          {:ok, string_and_more} <- pread_file(strfile.path, offset, strfile.header.longest_string) do
       {:ok, trim_string_to_separator(string_and_more, strfile.header.separator)}
