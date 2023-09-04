@@ -29,7 +29,7 @@ defmodule Mix.Tasks.Compile.StrfileCompiler do
   defstruct location: 0, num_string: 0, shortest_string: 4096, longest_string: 0, indices: []
 
   defp process_file(file) do
-    priv_path = Path.join(Mix.Project.app_path(), "priv")
+    priv_path = Path.join([Mix.Project.app_path(), "priv", "fortunes"])
     File.mkdir_p!(priv_path)
 
     source_strings = File.read!("fortunes/#{file}")

@@ -51,6 +51,20 @@ defmodule Fortune do
   end
 
   defp default_paths() do
-    [Application.app_dir(:fortune, "priv"), "/opt/homebrew/share/games/fortunes/"]
+    Application.loaded_applications()
+    |> Enum.map(&elem(&1, 0))
+    |> Enum.flat_map(&fortunes_dirs/1)
+  end
+
+  defp fortunes_dirs(name) do
+    dir = Application.app_dir(name, ["priv", "fortunes"])
+
+    if File.dir?(dir) do
+      [dir]
+    else
+      []
+    end
+  rescue
+    ArgumentError -> []
   end
 end
