@@ -21,12 +21,34 @@ defmodule Mix.Tasks.Compile.StrfileCompiler do
 
   @recursive true
 
+  defstruct location: 0, num_string: 0, shortest_string: 4096, longest_string: 0, indices: []
+
+  @doc false
   def run(_args) do
+    check_priv()
+
     File.ls!("fortunes")
     |> Enum.each(&process_file/1)
   end
 
-  defstruct location: 0, num_string: 0, shortest_string: 4096, longest_string: 0, indices: []
+  defp check_priv() do
+    priv_path = Path.join([Mix.Project.app_path(), "priv"])
+
+    case File.read_link(priv_path) do
+      {:ok, _} ->
+        Mix.shell().error("""
+        Cannot compile fortunes and use the priv directory at the same time.
+
+        One way of fixing this is to move the contents of the priv directory to
+        a different directory, e.g., assets. Then in the `mix.exs`, copy the
+        contents of the assets directory to the priv directory at compilation
+        time.
+        """)
+
+      _ ->
+        :ok
+    end
+  end
 
   defp process_file(file) do
     priv_path = Path.join([Mix.Project.app_path(), "priv", "fortunes"])
