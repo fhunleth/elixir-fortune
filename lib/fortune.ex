@@ -11,9 +11,9 @@ defmodule Fortune do
   @doc """
   Pick one tip randomly
   """
-  @spec random() :: {:ok, String.t()} | {:error, atom()}
-  def random() do
-    options = Application.get_all_env(:fortune)
+  @spec random([fortune_option]) :: {:ok, String.t()} | {:error, atom()}
+  def random(options \\ []) do
+    options = if options == [], do: Application.get_all_env(:fortune), else: options
     path = fortune_paths(options) |> Enum.random()
 
     with {:ok, strfile} <- Strfile.open(path),
@@ -27,8 +27,8 @@ defmodule Fortune do
   @doc """
   Raising version of random/0
   """
-  def random!() do
-    case random() do
+  def random!(options \\ []) do
+    case random(options) do
       {:ok, string} -> string
       {:error, reason} -> raise RuntimeError, "Fortune.random failed with #{reason}"
     end
