@@ -73,14 +73,28 @@ defmodule Fortune do
   end
 
   defp fortune_provider_apps(options) do
-    inclusion_list = [options[:include] || []] |> List.flatten()
-    exclusion_list = [options[:exclude] || []] |> List.flatten()
+    inclusion_list = get_filter_option(options, :include)
+    exclusion_list = get_filter_option(options, :exclude)
     apps = Application.loaded_applications() |> Enum.map(&elem(&1, 0))
 
-    if Enum.empty?(inclusion_list) and Enum.empty?(exclusion_list) do
-      apps
-    else
-      apps |> Enum.filter(&(&1 in inclusion_list and &1 not in exclusion_list))
+    cond do
+      is_list(inclusion_list) ->
+        apps |> Enum.filter(&(&1 in inclusion_list))
+
+      is_list(exclusion_list) ->
+        apps |> Enum.reject(&(&1 in exclusion_list))
+
+      true ->
+        apps
+    end
+  end
+
+  defp get_filter_option(options, key) do
+    case options[key] do
+      nil -> nil
+      [] -> nil
+      values when is_list(values) -> values
+      value -> [value]
     end
   end
 
