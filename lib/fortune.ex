@@ -3,6 +3,13 @@ defmodule Fortune do
 
   alias Fortune.Strfile
 
+  @typedoc """
+  The fortune options
+
+  * `:paths` - a list of absolute paths to `fortunes` directories
+  * `:include` - a list of applications whose fortunes you want to opt in for
+  * `:exclude` - a list of applications whose fortunes you want to opt out of
+  """
   @type fortune_option() ::
           {:paths, String.t() | [String.t()] | nil}
           | {:include, atom | [atom] | nil}
@@ -43,11 +50,6 @@ defmodule Fortune do
   Alternatively, you can select or reject certain fortunes by providing
   application name atoms as an inclusion list or exclusion list.
 
-  Options:
-
-  * `:paths` - a list of absolute paths to `fortunes` directories
-  * `:include` - a list of applications whose fortunes you want to opt in for
-  * `:exclude` - a list of applications whose fortunes you want to opt out of
   """
   @spec fortune_paths([fortune_option]) :: [String.t()]
   def fortune_paths(options \\ []) do
