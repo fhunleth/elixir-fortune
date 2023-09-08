@@ -21,9 +21,10 @@ defmodule Fortune do
   @spec random([fortune_option]) :: {:ok, String.t()} | {:error, atom()}
   def random(options \\ []) do
     options = if options == [], do: Application.get_all_env(:fortune), else: options
-    path = fortune_paths(options) |> Enum.random()
+    paths_found = fortune_paths(options)
+    if paths_found == [], do: raise("no fortune path found")
 
-    with {:ok, strfile} <- Strfile.open(path),
+    with {:ok, strfile} <- paths_found |> Enum.random() |> Strfile.open(),
          rand_index = :rand.uniform(strfile.header.num_string) - 1,
          {:ok, string} <- Strfile.read_string(strfile, rand_index) do
       _ = Strfile.close(strfile)
