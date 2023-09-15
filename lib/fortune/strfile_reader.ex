@@ -1,4 +1,4 @@
-defmodule Fortune.Strfile do
+defmodule Fortune.StrfileReader do
   @moduledoc false
   @strfile_max_header_len 44
 
