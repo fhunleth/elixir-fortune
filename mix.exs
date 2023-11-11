@@ -4,12 +4,14 @@ defmodule Fortune.MixProject do
   @version "0.1.0"
   @source_url "https://github.com/fhunleth/fortune"
 
-  def project do
+  def project() do
     [
       app: :fortune,
       version: @version,
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
+      compilers: compilers(Mix.env()),
+      fortune: [inputs: ["test/support/elixir"]],
       docs: docs(),
       description: description(),
       package: package(),
@@ -23,13 +25,19 @@ defmodule Fortune.MixProject do
     ]
   end
 
-  def application do
+  def application() do
     [
       extra_applications: []
     ]
   end
 
-  defp deps do
+  def compilers(env) when env in [:dev, :test] do
+    Mix.compilers() ++ [:strfile_compiler]
+  end
+
+  def compilers(_env), do: Mix.compilers()
+
+  defp deps() do
     [
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
@@ -37,7 +45,7 @@ defmodule Fortune.MixProject do
     ]
   end
 
-  defp docs do
+  defp docs() do
     [
       extras: ["README.md", "CHANGELOG.md"],
       main: "readme",
@@ -47,11 +55,11 @@ defmodule Fortune.MixProject do
     ]
   end
 
-  defp description do
+  defp description() do
     "Fortune file reader for Elixir"
   end
 
-  defp package do
+  defp package() do
     [
       files: ["CHANGELOG.md", "lib", "LICENSE", "mix.exs", "README.md"],
       licenses: ["Apache-2.0"],

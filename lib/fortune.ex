@@ -1,7 +1,7 @@
 defmodule Fortune do
   @moduledoc false
 
-  alias Fortune.Strfile
+  alias Fortune.StrfileReader
 
   @typedoc """
   The fortune options
@@ -21,14 +21,35 @@ defmodule Fortune do
   @spec random([fortune_option]) :: {:ok, String.t()} | {:error, atom()}
   def random(options \\ []) do
     options = if options == [], do: Application.get_all_env(:fortune), else: options
-    paths_found = fortune_paths(options)
-    if paths_found == [], do: raise("no fortune path found")
+    strfiles = fortune_paths(options) |> open_all()
+    if strfiles == [], do: raise("no valid fortune path found")
 
-    with {:ok, strfile} <- paths_found |> Enum.random() |> Strfile.open(),
-         rand_index = :rand.uniform(strfile.header.num_string) - 1,
-         {:ok, string} <- Strfile.read_string(strfile, rand_index) do
-      _ = Strfile.close(strfile)
-      {:ok, string}
+    num_fortunes =
+      Enum.reduce(strfiles, 0, fn strfile, acc -> acc + strfile.header.num_string end)
+
+    rand_fortune = :rand.uniform(num_fortunes - 1)
+
+    result = nth_fortune(strfiles, rand_fortune)
+
+    Enum.each(strfiles, &StrfileReader.close/1)
+    result
+  end
+
+  defp nth_fortune([strfile | rest], n) do
+    if n >= strfile.header.num_string do
+      nth_fortune(rest, n - strfile.header.num_string)
+    else
+      StrfileReader.read_string(strfile, n)
+    end
+  end
+
+  defp open_all(paths, acc \\ [])
+  defp open_all([], acc), do: acc
+
+  defp open_all([path | rest], acc) do
+    case StrfileReader.open(path) do
+      {:ok, info} -> open_all(rest, [info | acc])
+      {:error, _} -> open_all(rest, acc)
     end
   end
 
@@ -63,12 +84,12 @@ defmodule Fortune do
         paths when is_list(paths) -> paths
       end
 
-    Strfile.search_paths(paths)
+    StrfileReader.search_paths(paths)
   end
 
   @spec fortune_info(Path.t()) :: {:ok, map()} | {:error, atom()}
   def fortune_info(path) do
-    Strfile.read_info(path)
+    StrfileReader.read_info(path)
   end
 
   defp default_paths(options) do
@@ -102,7 +123,7 @@ defmodule Fortune do
   end
 
   defp fortunes_dirs(name) do
-    dir = Application.app_dir(name, ["priv", "fortunes"])
+    dir = Application.app_dir(name, ["priv", "fortune"])
 
     if File.dir?(dir) do
       [dir]

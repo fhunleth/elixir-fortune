@@ -24,8 +24,16 @@ defmodule Mix.Tasks.Compile.StrfileCompiler do
   def run(_args) do
     check_priv()
 
-    File.ls!("fortunes")
-    |> Enum.each(&process_file/1)
+    inputs = Mix.Project.config()[:inputs] || default_inputs()
+
+    Enum.each(inputs, &process_file/1)
+  end
+
+  defp default_inputs() do
+    case File.ls("fortune") do
+      {:ok, paths} -> paths
+      {:error, _any} -> []
+    end
   end
 
   defp check_priv() do

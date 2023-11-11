@@ -21,7 +21,7 @@ defmodule Fortune.StrfileWriter do
       |> String.split(divider)
       |> process_strings(state)
 
-    filename = Path.basename()
+    filename = Path.basename(input_path)
     strings_file = Path.join(output_dir, filename)
     index_file = Path.join(output_dir, "#{filename}.dat")
 

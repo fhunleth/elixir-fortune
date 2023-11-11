@@ -16,7 +16,8 @@ defmodule Fortune.StrfileReader do
   end
 
   def close(strfile) do
-    File.close(strfile.io)
+    _ = File.close(strfile.io)
+    :ok
   end
 
   def read_string(strfile, index) do
