@@ -4,7 +4,7 @@
 
 This package provides the following features:
 
-- `:strfile_compiler` Mix compiler that builds a [strfile]-format index file
+- `:fortune_compiler` Mix compiler that builds a [strfile]-format index file
   based on your text file that contains a collection of quotes separated by a
   `%` line
 - Elixir functions that read a random fortune from compilied [strfile]s
@@ -43,15 +43,15 @@ elixir-fortune can be configured either:
 - specifying settings in your `config/config.exs`; or
 - passing `Fortune.random/1` options at runtime
 
-See [online documentaton](https://hexdocs.pm/fortune) for available options.
+See [online documentation](https://hexdocs.pm/fortune) for available options.
 
 ### compile-time configuration
 
 Here are examples:
 
 ```elixir
-# list absolute paths to `fortunes` directories
-config :fortune, paths: [Path.join(["some/location", "fortunes"])]]
+# list absolute paths to `fortune` directories
+config :fortune, paths: [Path.join(["some/location", "fortune"])]]
 
 # list applications whose fortunes you want to opt in for
 config :fortune, include: [:foo_app, :bar_app]
@@ -72,9 +72,9 @@ iex> Fortune.random(exclude: [:foo_app, :bar_app])
 
 Here are the steps to take:
 
-1. create `fortunes` directory in your Elixir project
-1. create a fortune text file or more that have no extension in your `fortunes` directory
-1. append `:strfile_compiler` to default Mix compilers in your `mix.exs`
+1. create a `fortune` directory in your Elixir project
+1. create a fortune text file or more that have no extension in your `fortune` directory
+1. append `:fortune_compiler` to default Mix compilers in your `mix.exs`
 1. run `mix compile`
 
 **fortune file format**
@@ -84,8 +84,8 @@ currently elixir-fortune won't recognize them.
 
 ```bash
 cd path/to/my/project
-mkdir -p fortunes
-touch fortunes/my-custom-quotes
+mkdir -p fortune
+touch fortune/my-custom-quotes
 ```
 
 **fortune content format**
@@ -104,13 +104,13 @@ The last string
 
 **setting up strfile compiler**
 
-Append `:strfile_compiler` to ` Mix.compilers/1` in your `mix.exs` as follows:
+Append `:fortune_compiler` to ` Mix.compilers/1` in your `mix.exs` as follows:
 
 ```elixir
   def project do
     [
       ...
-      compilers: Mix.compilers() ++ [:strfile_compiler],
+      compilers: Mix.compilers() ++ [:fortune_compiler],
       ...
     ]
   end
@@ -118,12 +118,11 @@ Append `:strfile_compiler` to ` Mix.compilers/1` in your `mix.exs` as follows:
 
 **compiling fortunes**
 
-When you run `mix compile`, `:strfile_compiler` will scan all the `fortunes`
-directory in your project and its dependencies, then generate a `.dat` index
+When you run `mix compile`, `:fortune_compiler` will scan all the `fortune`
+directories in your project and its dependencies, then generate a `.dat` index
 data file corresponding to each fortune text file.
 
 ```bash
 mix deps.get
 mix compile
 ```
-

@@ -6,17 +6,19 @@ defmodule Fortune do
   @typedoc """
   The fortune options
 
-  * `:paths` - a list of absolute paths to `fortunes` directories
-  * `:include` - a list of applications whose fortunes you want to opt in for
-  * `:exclude` - a list of applications whose fortunes you want to opt out of
+  * `:paths` - a list of absolute paths to `fortune` directories
+  * `:include` - specifically include these applications that contain fortunes
+  * `:exclude` - exclude these applications from being scanned for fortunes
   """
   @type fortune_option() ::
-          {:paths, String.t() | [String.t()] | nil}
-          | {:include, atom | [atom] | nil}
-          | {:exclude, atom | [atom] | nil}
+          [
+            paths: String.t() | [String.t()] | nil,
+            include: atom | [atom] | nil,
+            exclude: atom | [atom] | nil
+          ]
 
   @doc """
-  Pick one tip randomly
+  Pick one fortune randomly
   """
   @spec random([fortune_option]) :: {:ok, String.t()} | {:error, atom()}
   def random(options \\ []) do
@@ -28,7 +30,6 @@ defmodule Fortune do
       Enum.reduce(strfiles, 0, fn strfile, acc -> acc + strfile.header.num_string end)
 
     rand_fortune = :rand.uniform(num_fortunes - 1)
-
     result = nth_fortune(strfiles, rand_fortune)
 
     Enum.each(strfiles, &StrfileReader.close/1)

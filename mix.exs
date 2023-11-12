@@ -32,7 +32,7 @@ defmodule Fortune.MixProject do
   end
 
   def compilers(env) when env in [:dev, :test] do
-    Mix.compilers() ++ [:strfile_compiler]
+    Mix.compilers() ++ [:fortune_compiler]
   end
 
   def compilers(_env), do: Mix.compilers()

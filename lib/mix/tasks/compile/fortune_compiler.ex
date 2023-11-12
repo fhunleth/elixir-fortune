@@ -1,8 +1,8 @@
-defmodule Mix.Tasks.Compile.StrfileCompiler do
+defmodule Mix.Tasks.Compile.FortuneCompiler do
   @moduledoc """
-  Build STRFILE-format index files
+  Build STRFILE-format index files for use by fortune
 
-  The input files should be in a `fortunes` directory. Each string or fortune
+  The input files should be in a `fortune` directory. Each string or fortune
   should be separated by a `%` line. For example:
 
   ```text
