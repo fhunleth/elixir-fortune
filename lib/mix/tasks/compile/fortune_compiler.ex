@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Compile.StrfileCompiler do
+defmodule Mix.Tasks.Compile.FortuneCompiler do
   @moduledoc """
   Build STRFILE-format index files
 

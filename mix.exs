@@ -14,7 +14,7 @@ defmodule Fortune.MixProject do
       description: description(),
       package: package(),
       deps: deps(),
-      compilers: Mix.compilers() ++ [:strfile_compiler],
+      compilers: Mix.compilers() ++ [:fortune_compiler],
       dialyzer: dialyzer(),
       preferred_cli_env: %{
         docs: :docs,
