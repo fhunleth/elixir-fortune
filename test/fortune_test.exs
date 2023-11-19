@@ -6,19 +6,19 @@ defmodule FortuneTest do
 
   test "finding built-in fortunes" do
     options = []
-    assert Fortune.fortune_paths(options) == fortune_paths()
+    assert_same(Fortune.fortune_paths(options), fortune_paths())
   end
 
   test "finding fortunes with explicit fortunes paths" do
     priv_dir = Application.app_dir(:fortune, "priv")
 
     options = [paths: [Path.join([priv_dir, "fortune"])]]
-    assert Fortune.fortune_paths(options) == fortune_paths()
+    assert_same(Fortune.fortune_paths(options), fortune_paths())
   end
 
   test "finding fortunes with app inclusion list" do
     options = [include: [:fortune]]
-    assert Fortune.fortune_paths(options) == fortune_paths()
+    assert_same(Fortune.fortune_paths(options), fortune_paths())
 
     options = [include: [:foo]]
     assert Fortune.fortune_paths(options) == []
@@ -29,7 +29,7 @@ defmodule FortuneTest do
     assert Fortune.fortune_paths(options) == []
 
     options = [exclude: [:foo]]
-    assert Fortune.fortune_paths(options) == fortune_paths()
+    assert_same(Fortune.fortune_paths(options), fortune_paths())
   end
 
   defp fortune_paths() do
@@ -37,5 +37,12 @@ defmodule FortuneTest do
 
     @fortune_files
     |> Enum.map(&Path.join([priv_dir, "fortune", &1]))
+  end
+
+  # same contents in list ignoring order
+  defp assert_same(list1, list2) do
+    m1 = list1 |> Enum.map(fn x -> {x, true} end) |> Map.new()
+    m2 = list2 |> Enum.map(fn x -> {x, true} end) |> Map.new()
+    assert m1 == m2
   end
 end
