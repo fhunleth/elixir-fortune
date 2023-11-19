@@ -24,14 +24,15 @@ defmodule Mix.Tasks.Compile.FortuneCompiler do
   def run(_args) do
     check_priv()
 
-    inputs = Mix.Project.config()[:inputs] || default_inputs()
+    paths = Mix.Project.config()[:fortune_paths] || ["fortune"]
+    inputs = Enum.flat_map(paths, &find_files/1)
 
     Enum.each(inputs, &process_file/1)
   end
 
-  defp default_inputs() do
-    case File.ls("fortune") do
-      {:ok, paths} -> paths
+  defp find_files(path) do
+    case File.ls(path) do
+      {:ok, paths} -> Enum.map(paths, &Path.join(path, &1))
       {:error, _any} -> []
     end
   end
@@ -59,6 +60,6 @@ defmodule Mix.Tasks.Compile.FortuneCompiler do
     priv_path = Path.join([Mix.Project.app_path(), "priv", "fortune"])
     File.mkdir_p!(priv_path)
 
-    StrfileWriter.create("fortune/#{file}", priv_path)
+    StrfileWriter.create(file, priv_path)
   end
 end

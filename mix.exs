@@ -9,9 +9,6 @@ defmodule Fortune.MixProject do
       app: :fortune,
       version: @version,
       elixir: "~> 1.11",
-      start_permanent: Mix.env() == :prod,
-      compilers: compilers(Mix.env()),
-      fortune: [inputs: ["test/support/elixir"]],
       docs: docs(),
       description: description(),
       package: package(),
@@ -22,7 +19,7 @@ defmodule Fortune.MixProject do
         "hex.publish": :docs,
         "hex.build": :docs
       }
-    ]
+    ] ++ test_options(Mix.env())
   end
 
   def application() do
@@ -31,11 +28,13 @@ defmodule Fortune.MixProject do
     ]
   end
 
-  def compilers(env) when env in [:dev, :test] do
-    Mix.compilers() ++ [:fortune_compiler]
+  # Only run the fortune compiler for dev and test
+  # The prod version doesn't include any fortunes.
+  def test_options(env) when env in [:dev, :test] do
+    [compilers: Mix.compilers() ++ [:fortune_compiler], fortune_paths: ["test/fortune"]]
   end
 
-  def compilers(_env), do: Mix.compilers()
+  def test_options(_env), do: []
 
   defp deps() do
     [

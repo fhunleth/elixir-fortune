@@ -24,16 +24,19 @@ defmodule Fortune do
   def random(options \\ []) do
     options = if options == [], do: Application.get_all_env(:fortune), else: options
     strfiles = fortune_paths(options) |> open_all()
-    if strfiles == [], do: raise("no valid fortune path found")
 
-    num_fortunes =
-      Enum.reduce(strfiles, 0, fn strfile, acc -> acc + strfile.header.num_string end)
+    if strfiles != [] do
+      num_fortunes =
+        Enum.reduce(strfiles, 0, fn strfile, acc -> acc + strfile.header.num_string end)
 
-    rand_fortune = :rand.uniform(num_fortunes - 1)
-    result = nth_fortune(strfiles, rand_fortune)
+      rand_fortune = :rand.uniform(num_fortunes - 1)
+      result = nth_fortune(strfiles, rand_fortune)
 
-    Enum.each(strfiles, &StrfileReader.close/1)
-    result
+      Enum.each(strfiles, &StrfileReader.close/1)
+      result
+    else
+      {:error, :no_fortunes}
+    end
   end
 
   defp nth_fortune([strfile | rest], n) do
