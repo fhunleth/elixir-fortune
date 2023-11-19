@@ -7,14 +7,14 @@ defmodule Fortune do
   The fortune options
 
   * `:paths` - a list of absolute paths to `fortune` directories
-  * `:include` - specifically include these applications that contain fortunes
-  * `:exclude` - exclude these applications from being scanned for fortunes
+  * `:included_applications` - specifically include these applications that contain fortunes
+  * `:excluded_applications` - exclude these applications from being scanned for fortunes
   """
   @type fortune_option() ::
           [
             paths: String.t() | [String.t()] | nil,
-            include: atom | [atom] | nil,
-            exclude: atom | [atom] | nil
+            included_applications: atom | [atom] | nil,
+            excluded_applications: atom | [atom] | nil
           ]
 
   @doc """
@@ -22,8 +22,8 @@ defmodule Fortune do
   """
   @spec random([fortune_option]) :: {:ok, String.t()} | {:error, atom()}
   def random(options \\ []) do
-    options = if options == [], do: Application.get_all_env(:fortune), else: options
-    strfiles = fortune_paths(options) |> open_all()
+    merged_options = Keyword.merge(Application.get_all_env(:fortune), options)
+    strfiles = merged_options |> fortune_paths() |> open_all()
 
     if strfiles != [] do
       num_fortunes =
@@ -75,11 +75,10 @@ defmodule Fortune do
 
   Alternatively, you can select or reject certain fortunes by providing
   application name atoms as an inclusion list or exclusion list.
-
   """
   @spec fortune_paths([fortune_option]) :: [String.t()]
   def fortune_paths(options \\ []) do
-    filter_options = Keyword.take(options, [:include, :exclude])
+    filter_options = Keyword.take(options, [:included_applications, :excluded_applications])
 
     paths =
       case options[:paths] do
@@ -101,8 +100,8 @@ defmodule Fortune do
   end
 
   defp fortune_provider_apps(options) do
-    inclusion_list = get_filter_option(options, :include)
-    exclusion_list = get_filter_option(options, :exclude)
+    inclusion_list = get_filter_option(options, :included_applications)
+    exclusion_list = get_filter_option(options, :excluded_applications)
     apps = Application.loaded_applications() |> Enum.map(&elem(&1, 0))
 
     cond do

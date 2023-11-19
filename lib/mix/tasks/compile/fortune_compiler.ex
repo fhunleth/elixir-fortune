@@ -1,9 +1,13 @@
 defmodule Mix.Tasks.Compile.FortuneCompiler do
   @moduledoc """
-  Build STRFILE-format index files for use by fortune
+  Compiles fortune files
 
-  The input files should be in a `fortune` directory. Each string or fortune
-  should be separated by a `%` line. For example:
+  This compiler parses specially formatted files, indexes them, and saves the results
+  to the `priv/fortune` directory. To be precise, this does what the Unix `strfile`
+  command does.
+
+  By default, input files should be placed in the `fortune` directory in a project.
+  Each fortune (aka string) is separated by a `%` line like the following:
 
   ```text
   My first fortune
@@ -13,6 +17,10 @@ defmodule Mix.Tasks.Compile.FortuneCompiler do
   %
   The last string
   ```
+
+  # Configuration
+
+  * `:fortunec_paths` - directories to find fortune files. Defaults to `["fortune"]`
   """
   use Mix.Task
 
@@ -24,7 +32,7 @@ defmodule Mix.Tasks.Compile.FortuneCompiler do
   def run(_args) do
     check_priv()
 
-    paths = Mix.Project.config()[:fortune_paths] || ["fortune"]
+    paths = Mix.Project.config()[:fortunec_paths] || ["fortune"]
     inputs = Enum.flat_map(paths, &find_files/1)
 
     Enum.each(inputs, &process_file/1)

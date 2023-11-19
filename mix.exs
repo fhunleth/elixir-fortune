@@ -31,7 +31,7 @@ defmodule Fortune.MixProject do
   # Only run the fortune compiler for dev and test
   # The prod version doesn't include any fortunes.
   def test_options(env) when env in [:dev, :test] do
-    [compilers: Mix.compilers() ++ [:fortune_compiler], fortune_paths: ["test/fortune"]]
+    [compilers: Mix.compilers() ++ [:fortune_compiler], fortunec_paths: ["test/support/fortune"]]
   end
 
   def test_options(_env), do: []

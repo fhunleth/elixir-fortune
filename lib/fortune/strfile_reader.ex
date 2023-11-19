@@ -4,7 +4,7 @@ defmodule Fortune.StrfileReader do
 
   @spec search_paths([String.t()]) :: [String.t()]
   def search_paths(paths) do
-    Enum.flat_map(paths, &scan_dir_for_fortune/1)
+    Enum.flat_map(paths, &scan_for_fortunes/1)
   end
 
   @spec open(Path.t()) :: {:ok, map()} | {:error, atom()}
@@ -39,7 +39,15 @@ defmodule Fortune.StrfileReader do
     end
   end
 
-  defp scan_dir_for_fortune(path) do
+  defp scan_for_fortunes(path) do
+    case File.stat(path) do
+      {:ok, %{type: :directory}} -> scan_dir_for_fortunes(path)
+      {:ok, %{type: :regular}} -> if strfile_path?(path), do: [path], else: []
+      _ -> []
+    end
+  end
+
+  defp scan_dir_for_fortunes(path) do
     case File.ls(path) do
       {:ok, paths} ->
         paths
