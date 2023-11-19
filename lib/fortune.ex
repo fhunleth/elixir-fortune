@@ -1,16 +1,42 @@
 defmodule Fortune do
-  @moduledoc false
+  @moduledoc """
+  Get a fortune!
 
+  Fortune reads a string, usually a random one, from one or more fortune files. Fortune
+  files contain a list of strings and an associated index for for quick retrieval of
+  a randomly chosen string. This implementation provides an Elixir take on the
+  ubiquitous Unix fortune implementation. It is compatible with Unix fortune and can read most Unix fortune files.
+
+  ```elixir
+  iex> Fortune.random()
+  {:ok, "A fortune would be here!"}
+  ```
+
+  No fortunes are provided, though. You'll need to add your own, add Elixir libraries to your
+  mix dependencies that have fortunes, or configure Fortune to use your system ones.
+
+  Here's an example on Mac when you've installed `fortune` via Homebrew:
+
+  ```elixir
+  iex> Fortune.random(paths: ["/opt/homebrew/share/games/fortunes/"])
+  {:ok, "Good luck"}
+  ```
+
+  Fortunes provided by Elixir libraries are stored in that library's `priv/fortune` directory
+  when using this library's `fortune` compiler. Fortune scans for these paths by default.
+  """
+
+  alias Fortune.Finder
   alias Fortune.StrfileReader
 
   @typedoc """
-  The fortune options
+  Fortune options
 
-  * `:paths` - a list of absolute paths to `fortune` directories
+  * `:paths` - a list of absolute paths to `fortune` directories or files
   * `:included_applications` - specifically include these applications that contain fortunes
   * `:excluded_applications` - exclude these applications from being scanned for fortunes
   """
-  @type fortune_option() ::
+  @type fortune_options() ::
           [
             paths: String.t() | [String.t()] | nil,
             included_applications: atom | [atom] | nil,
@@ -20,10 +46,10 @@ defmodule Fortune do
   @doc """
   Pick one fortune randomly
   """
-  @spec random([fortune_option]) :: {:ok, String.t()} | {:error, atom()}
+  @spec random(fortune_options) :: {:ok, String.t()} | {:error, atom()}
   def random(options \\ []) do
     merged_options = Keyword.merge(Application.get_all_env(:fortune), options)
-    strfiles = merged_options |> fortune_paths() |> open_all()
+    strfiles = merged_options |> Finder.fortune_paths() |> open_all()
 
     if strfiles != [] do
       num_fortunes =
@@ -60,80 +86,11 @@ defmodule Fortune do
   @doc """
   Raising version of random/0
   """
+  @spec random!(fortune_options()) :: String.t()
   def random!(options \\ []) do
     case random(options) do
       {:ok, string} -> string
       {:error, reason} -> raise RuntimeError, "Fortune.random failed with #{reason}"
     end
-  end
-
-  @doc """
-  Scan search paths for fortune files. By default, search for all the fortune
-  files that are provided by your Elixir project and its dependencies.
-
-  If you don't want to use the defaults, paths can be passed in to search.
-
-  Alternatively, you can select or reject certain fortunes by providing
-  application name atoms as an inclusion list or exclusion list.
-  """
-  @spec fortune_paths([fortune_option]) :: [String.t()]
-  def fortune_paths(options \\ []) do
-    filter_options = Keyword.take(options, [:included_applications, :excluded_applications])
-
-    paths =
-      case options[:paths] do
-        path when is_binary(path) -> [path]
-        nil -> default_paths(filter_options)
-        paths when is_list(paths) -> paths
-      end
-
-    StrfileReader.search_paths(paths)
-  end
-
-  @spec fortune_info(Path.t()) :: {:ok, map()} | {:error, atom()}
-  def fortune_info(path) do
-    StrfileReader.read_info(path)
-  end
-
-  defp default_paths(options) do
-    fortune_provider_apps(options) |> Enum.flat_map(&fortunes_dirs/1)
-  end
-
-  defp fortune_provider_apps(options) do
-    inclusion_list = get_filter_option(options, :included_applications)
-    exclusion_list = get_filter_option(options, :excluded_applications)
-    apps = Application.loaded_applications() |> Enum.map(&elem(&1, 0))
-
-    cond do
-      is_list(inclusion_list) ->
-        apps |> Enum.filter(&(&1 in inclusion_list))
-
-      is_list(exclusion_list) ->
-        apps |> Enum.reject(&(&1 in exclusion_list))
-
-      true ->
-        apps
-    end
-  end
-
-  defp get_filter_option(options, key) do
-    case options[key] do
-      nil -> nil
-      [] -> nil
-      values when is_list(values) -> values
-      value -> [value]
-    end
-  end
-
-  defp fortunes_dirs(name) do
-    dir = Application.app_dir(name, ["priv", "fortune"])
-
-    if File.dir?(dir) do
-      [dir]
-    else
-      []
-    end
-  rescue
-    ArgumentError -> []
   end
 end

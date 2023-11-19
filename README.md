@@ -7,7 +7,7 @@ This package provides the following features:
 - `:fortune_compiler` Mix compiler that builds a [strfile]-format index file
   based on your text file that contains a collection of quotes separated by a
   `%` line
-- Elixir functions that read a random fortune from compilied [strfile]s
+- Elixir functions that read a random fortune from compiled [strfile]s
 
 [Fortune]: https://wiki.archlinux.org/title/Fortune
 [fortune]: https://man.archlinux.org/man/fortune.6
@@ -34,12 +34,13 @@ iex> Fortune.random()
 {:ok, "Elixir – where functional meets fun."}
 ```
 
-By default, elixir-fortune will search for all avaiable fortune files that
+By default, elixir-fortune will search for all available fortune files that
 provided by your Elixir project and its dependencies.
 
 ## Configuration
 
 elixir-fortune can be configured either:
+
 - specifying settings in your `config/config.exs`; or
 - passing `Fortune.random/1` options at runtime
 
@@ -93,7 +94,7 @@ touch fortune/my-custom-quotes
 In your fortune text file, your quotes should be separated by a `%` line. For
 example:
 
-```
+```text
 My first fortune
 %
 Another string or fortune
