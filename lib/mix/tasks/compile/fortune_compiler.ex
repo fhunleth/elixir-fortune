@@ -50,7 +50,7 @@ defmodule Mix.Tasks.Compile.FortuneCompiler do
 
     case File.read_link(priv_path) do
       {:ok, _} ->
-        Mix.shell().error("""
+        Mix.raise("""
         Cannot compile fortunes and use the priv directory at the same time.
 
         One way of fixing this is to move the contents of the priv directory to

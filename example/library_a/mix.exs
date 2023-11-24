@@ -22,7 +22,7 @@ defmodule LibraryA.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:fortune, path: "../.."}
+      {:fortune, path: System.get_env("FORTUNE_PATH", "../..")}
     ]
   end
 end
