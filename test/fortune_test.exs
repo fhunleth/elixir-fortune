@@ -8,13 +8,13 @@ defmodule FortuneTest do
     end
 
     test "error when no fortunes" do
-      assert {:error, :no_fortunes} = Fortune.random(paths: [])
+      assert {:error, :no_fortunes} = Fortune.random(paths: ["/nowhere"])
     end
   end
 
   describe "random!/1" do
     test "raise when no fortunes" do
-      assert_raise RuntimeError, fn -> Fortune.random!(paths: []) end
+      assert_raise RuntimeError, fn -> Fortune.random!(paths: ["/nowhere"]) end
     end
   end
 end

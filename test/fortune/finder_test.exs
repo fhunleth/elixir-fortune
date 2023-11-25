@@ -7,13 +7,13 @@ defmodule Fortune.FinderTest do
   test "finding built-in fortunes" do
     options = []
     assert_same(Finder.fortune_paths(options), fortune_paths())
+
+    options = [paths: []]
+    assert_same(Finder.fortune_paths(options), fortune_paths())
   end
 
   test "finding fortunes with explicit fortune paths" do
     priv_dir = Application.app_dir(:fortune, "priv")
-
-    options = [paths: []]
-    assert Finder.fortune_paths(options) == []
 
     options = [paths: [Path.join([priv_dir, "fortune"])]]
     assert_same(Finder.fortune_paths(options), fortune_paths())
@@ -26,18 +26,18 @@ defmodule Fortune.FinderTest do
   end
 
   test "finding fortunes with app inclusion list" do
-    options = [included_applications: [:fortune]]
+    options = [included_applications: [:fortune], include_system_fortunes?: false]
     assert_same(Finder.fortune_paths(options), fortune_paths())
 
-    options = [included_applications: [:foo]]
+    options = [included_applications: [:foo], include_system_fortunes?: false]
     assert Finder.fortune_paths(options) == []
   end
 
   test "finding fortunes with app exclusion list" do
-    options = [excluded_applications: [:fortune]]
+    options = [excluded_applications: [:fortune], include_system_fortunes?: false]
     assert Finder.fortune_paths(options) == []
 
-    options = [excluded_applications: [:foo]]
+    options = [excluded_applications: [:foo], include_system_fortunes?: false]
     assert_same(Finder.fortune_paths(options), fortune_paths())
   end
 

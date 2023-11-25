@@ -1,17 +1,36 @@
 # Fortune
 
-[Fortune] file reader for Elixir.
+[![Hex version](https://img.shields.io/hexpm/v/fortune.svg "Hex version")](https://hex.pm/packages/fortune)
+[![API docs](https://img.shields.io/hexpm/v/fortune.svg?label=hexdocs "API docs")](https://hexdocs.pm/fortune/)
+[![CircleCI](https://circleci.com/gh/fhunleth/fortune.svg?style=svg)](https://circleci.com/gh/fhunleth/fortune)
 
-This package provides the following features:
+Get a fortune!
 
-- `:fortune_compiler` Mix compiler that builds a [strfile]-format index file
-  based on your text file that contains a collection of quotes separated by a
-  `%` line
-- Elixir functions that read a random fortune from compiled [strfile]s
+Fortune reads a string, usually a random one, from one or more fortune files.
+Fortune files contain a list of strings and an associated index for for quick
+retrieval of a randomly chosen string. This implementation provides an Elixir
+take on the ubiquitous [Unix fortune](https://en.wikipedia.org/wiki/Fortune_(Unix))
+implementation. It is compatible with Unix fortune and can read most Unix
+fortune files.
 
-[Fortune]: https://wiki.archlinux.org/title/Fortune
-[fortune]: https://man.archlinux.org/man/fortune.6
-[strfile]: https://man.archlinux.org/man/strfile.1
+```elixir
+iex> Fortune.random()
+{:ok, "Harness the power of the BEAM, one Elixir potion at a time."}
+```
+
+No fortunes are provided, though. You'll need to add your own, add Elixir
+libraries to your mix dependencies that have fortunes, or configure Fortune to
+use your system ones.
+
+Here's an example on Mac when you've installed `fortune` via Homebrew:
+
+```elixir
+Fortune.random(include_system_fortunes?: true)
+```
+
+Fortunes provided by Elixir libraries are stored in that library's
+`priv/fortune` directory when using this library's `fortune` compiler. Fortune
+scans for these paths by default.
 
 ## Installation
 
@@ -25,74 +44,48 @@ def deps do
 end
 ```
 
-## Usage
-
-`Fortune.random/1` picks one from a collection of quotes.
-
-```elixir
-iex> Fortune.random()
-{:ok, "Elixir – where functional meets fun."}
-```
-
-By default, elixir-fortune will search for all available fortune files that
-provided by your Elixir project and its dependencies.
+Note that Fortune does NOT provide any fortunes itself.
 
 ## Configuration
 
-elixir-fortune can be configured either:
-
-- specifying settings in your `config/config.exs`; or
-- passing `Fortune.random/1` options at runtime
-
-See [online documentation](https://hexdocs.pm/fortune) for available options.
-
-### compile-time configuration
-
-Here are examples:
+The defaults should be good for most users. If not, see `fortune_options/0` to adjust fortune search paths and more. These can be passed to `Fortune.random/1` or added to your `config.exs` for use as new defaults:
 
 ```elixir
-# list absolute paths to `fortune` directories
+# Completely override fortune search paths
 config :fortune, paths: [Path.join(["some/location", "fortune"])]]
 
-# list applications whose fortunes you want to opt in for
-config :fortune, include: [:foo_app, :bar_app]
+# Only include fortunes from a couple applications
+config :fortune, included_applications: [:funny_app, :helpful_app]
 
-# list applications whose fortunes you want to opt out of
-config :fortune, exclude: [:foo_app, :bar_app]
+# Remove fortunes from a list of applications
+config :fortune, excluded_applications: [:bad_app]
 ```
 
-### runtime options
+## Adding fortunes to your Elixir project
 
-The same configuration options can be passed to `Fortune.random/1` at runtime.
+Any project can supply fortunes (or tips, since that's the likely use case).
 
-```elixir
-iex> Fortune.random(exclude: [:foo_app, :bar_app])
-```
+Here are the steps:
 
-## How to add custom fortunes to your Elixir project
+1. Create a `fortune` directory in your Elixir project
+1. Create one or more fortune-formatted files in the `fortune` directory
+1. Add the `:fortune_compiler` to the compilers list in your `mix.exs`
+1. Run `mix compile`
 
-Here are the steps to take:
+### Fortune files
 
-1. create a `fortune` directory in your Elixir project
-1. create a fortune text file or more that have no extension in your `fortune` directory
-1. append `:fortune_compiler` to default Mix compilers in your `mix.exs`
-1. run `mix compile`
+Fortune files are text files with quotes separated by `%` lines. Filenames can
+be anything but must not have an extension.
 
-**fortune file format**
+It's easies to see by example:
 
-It is important that your fortune text files have no extension; otherwise,
-currently elixir-fortune won't recognize them.
-
-```bash
+```sh
 cd path/to/my/project
 mkdir -p fortune
-touch fortune/my-custom-quotes
+touch fortune/my-fortunes
 ```
 
-**fortune content format**
-
-In your fortune text file, your quotes should be separated by a `%` line. For
-example:
+Then open `my-fortunes` in a text editor:
 
 ```text
 My first fortune
@@ -103,9 +96,10 @@ and this can be multiple lines too.
 The last string
 ```
 
-**setting up strfile compiler**
+### Compiling fortune files
 
-Append `:fortune_compiler` to ` Mix.compilers/1` in your `mix.exs` as follows:
+Fortune files need to be indexed for use by `fortune`. The `:fortune_compiler`
+knows how to do this, so add it to your `mix.exs`:
 
 ```elixir
   def project do
@@ -117,13 +111,22 @@ Append `:fortune_compiler` to ` Mix.compilers/1` in your `mix.exs` as follows:
   end
 ```
 
-**compiling fortunes**
+If you don't like putting your fortunes in the `fortune` directory, use the
+`:fortunec_paths` option.
 
-When you run `mix compile`, `:fortune_compiler` will scan all the `fortune`
-directories in your project and its dependencies, then generate a `.dat` index
-data file corresponding to each fortune text file.
+Finally, run:
 
-```bash
+```sh
 mix deps.get
 mix compile
+```
+
+Then to see the result of your work, run:
+
+```sh
+iex -S mix
+
+Interactive Elixir - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> Fortune.random()
+{:ok, "My first fortune"}
 ```

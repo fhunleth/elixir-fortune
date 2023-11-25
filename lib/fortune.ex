@@ -2,10 +2,11 @@ defmodule Fortune do
   @moduledoc """
   Get a fortune!
 
-  Fortune reads a string, usually a random one, from one or more fortune files. Fortune
-  files contain a list of strings and an associated index for for quick retrieval of
-  a randomly chosen string. This implementation provides an Elixir take on the
-  ubiquitous Unix fortune implementation. It is compatible with Unix fortune and can read most Unix fortune files.
+  Fortune reads a string, usually a random one, from one or more fortune files.
+  Fortune files contain a list of strings and an associated index for for quick
+  retrieval of a randomly chosen string. This implementation provides an Elixir
+  take on the ubiquitous Unix fortune implementation. It is compatible with
+  Unix fortune and can read most Unix fortune files.
 
   ```elixir
   # Although not necessary, let's seed the random algorithm
@@ -14,17 +15,18 @@ defmodule Fortune do
   {:ok, "Harness the power of the BEAM, one Elixir potion at a time."}
   ```
 
-  No fortunes are provided, though. You'll need to add your own, add Elixir libraries to your
-  mix dependencies that have fortunes, or configure Fortune to use your system ones.
+  No fortunes are provided, though. You'll need to add your own, add Elixir
+  libraries to your mix dependencies that have fortunes, or use your system's fortunes.
 
-  Here's an example on Mac when you've installed `fortune` via Homebrew:
+  Fortunes provided by Elixir libraries are stored in that library's
+  `priv/fortune` directory. See the `README.md` for using the `:fortune_compiler`
+  for adding your own.
 
-  ```elixir
-  Fortune.random(paths: ["/opt/homebrew/share/games/fortunes/"])
-  ```
+  If no Elixir-provided fortunes are found, `fortune` checks the system's
+  `/usr/share/games/fortune` directory (and various similar ones)  for fortunes
+  to find something.
 
-  Fortunes provided by Elixir libraries are stored in that library's `priv/fortune` directory
-  when using this library's `fortune` compiler. Fortune scans for these paths by default.
+  See `fortune_options/0` for modifying fortune search paths.
   """
 
   alias Fortune.Finder
@@ -33,9 +35,18 @@ defmodule Fortune do
   @typedoc """
   Fortune options
 
-  * `:paths` - a list of absolute paths to `fortune` directories or files
+  Pass these to `Fortune.random/1` and similar functions:
+
+  * `:paths` - a list of absolute paths to `fortune` directories or files. Overrides other options
   * `:included_applications` - specifically include these applications that contain fortunes
   * `:excluded_applications` - exclude these applications from being scanned for fortunes
+  * `:include_system_fortunes?` - set to `true` to include system fortunes. Defaults to `true` if no Elixir projects supply fortunes.
+
+  To set defaults for your project, add Fortune options to your application's `config.exs`:
+
+  ```elixir
+  config :fortune, include_system_fortunes?: true
+  ```
   """
   @type fortune_options() ::
           [
@@ -45,7 +56,7 @@ defmodule Fortune do
           ]
 
   @doc """
-  Pick one fortune randomly
+  Return a random fortune
   """
   @spec random(fortune_options) :: {:ok, String.t()} | {:error, atom()}
   def random(options \\ []) do
@@ -85,7 +96,7 @@ defmodule Fortune do
   end
 
   @doc """
-  Raising version of random/0
+  Raising version of random/1
   """
   @spec random!(fortune_options()) :: String.t()
   def random!(options \\ []) do

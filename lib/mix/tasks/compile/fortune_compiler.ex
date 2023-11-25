@@ -1,6 +1,6 @@
 defmodule Mix.Tasks.Compile.FortuneCompiler do
   @moduledoc """
-  Compiles fortune files
+  Compile fortune files
 
   This compiler parses specially formatted files, indexes them, and saves the results
   to the `priv/fortune` directory. To be precise, this does what the Unix `strfile`
