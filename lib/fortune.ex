@@ -8,8 +8,10 @@ defmodule Fortune do
   ubiquitous Unix fortune implementation. It is compatible with Unix fortune and can read most Unix fortune files.
 
   ```elixir
+  # Although not necessary, let's seed the random algorithm
+  iex> :rand.seed(:exsss, {8, 9, 10})
   iex> Fortune.random()
-  {:ok, "A fortune would be here!"}
+  {:ok, "Harness the power of the BEAM, one Elixir potion at a time."}
   ```
 
   No fortunes are provided, though. You'll need to add your own, add Elixir libraries to your
@@ -18,8 +20,7 @@ defmodule Fortune do
   Here's an example on Mac when you've installed `fortune` via Homebrew:
 
   ```elixir
-  iex> Fortune.random(paths: ["/opt/homebrew/share/games/fortunes/"])
-  {:ok, "Good luck"}
+  Fortune.random(paths: ["/opt/homebrew/share/games/fortunes/"])
   ```
 
   Fortunes provided by Elixir libraries are stored in that library's `priv/fortune` directory
