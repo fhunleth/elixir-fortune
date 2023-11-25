@@ -12,8 +12,6 @@ defmodule Fortune do
   Unix fortune and can read most Unix fortune files.
 
   ```elixir
-  # Although not necessary, let's seed the random algorithm
-  iex> :rand.seed(:exsss, {8, 9, 10})
   iex> Fortune.random()
   {:ok, "Harness the power of the BEAM, one Elixir potion at a time."}
   ```

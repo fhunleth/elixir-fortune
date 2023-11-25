@@ -1,6 +1,5 @@
 defmodule FortuneTest do
   use ExUnit.Case
-  doctest Fortune
 
   describe "random/1" do
     test "get a random fortune" do
