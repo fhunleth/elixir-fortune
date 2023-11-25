@@ -58,6 +58,9 @@ defmodule Fortune do
 
   @doc """
   Return a random fortune
+
+  See `Fortune` for an overview and `fortune_options/0` for modifying fortune
+  search paths.
   """
   @spec random(fortune_options) :: {:ok, String.t()} | {:error, atom()}
   def random(options \\ []) do
@@ -97,7 +100,10 @@ defmodule Fortune do
   end
 
   @doc """
-  Raising version of random/1
+  Return a random fortune or raise an exception
+
+  See `Fortune` for an overview and `fortune_options/0` for modifying fortune
+  search paths.
   """
   @spec random!(fortune_options()) :: String.t()
   def random!(options \\ []) do
