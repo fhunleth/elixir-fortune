@@ -2,7 +2,7 @@ defmodule Fortune.MixProject do
   use Mix.Project
 
   @version "0.1.0"
-  @source_url "https://github.com/fhunleth/fortune"
+  @source_url "https://github.com/fhunleth/elixir-fortune"
 
   def project() do
     [
@@ -55,7 +55,7 @@ defmodule Fortune.MixProject do
   end
 
   defp description() do
-    "Fortune file reader for Elixir"
+    "Get a fortune!"
   end
 
   defp package() do
