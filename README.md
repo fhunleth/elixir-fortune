@@ -3,6 +3,7 @@
 [![Hex version](https://img.shields.io/hexpm/v/fortune.svg "Hex version")](https://hex.pm/packages/fortune)
 [![API docs](https://img.shields.io/hexpm/v/fortune.svg?label=hexdocs "API docs")](https://hexdocs.pm/fortune/)
 [![CircleCI](https://circleci.com/gh/fhunleth/elixir-fortune.svg?style=svg)](https://circleci.com/gh/fhunleth/elixir-fortune)
+[![REUSE status](https://api.reuse.software/badge/github.com/fhunleth/elixir-fortune)](https://api.reuse.software/info/github.com/fhunleth/elixir-fortune)
 
 Get a fortune!
 
