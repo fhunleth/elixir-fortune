@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2023 Frank Hunleth, Masatoshi Nishiguchi
+#
+# SPDX-License-Identifier: Apache-2.0
 defmodule Mix.Tasks.Compile.FortuneCompiler do
   @moduledoc """
   Compile fortune files

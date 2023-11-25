@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2023 Frank Hunleth, Masatoshi Nishiguchi
+#
+# SPDX-License-Identifier: Apache-2.0
 defmodule Fortune.StrfileReader do
   @moduledoc false
   @strfile_max_header_len 44

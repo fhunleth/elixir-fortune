@@ -4,6 +4,13 @@ latest: &latest
   pattern: "^1.15.*-erlang-26.*$"
 
 jobs:
+  check-license:
+    docker:
+      - image: fsfe/reuse:latest
+    steps:
+      - checkout
+      - run: reuse lint
+
   build-test:
     parameters:
       tag:
@@ -24,6 +31,7 @@ jobs:
           keys:
             - v1-mix-cache-<< parameters.tag >>-{{ checksum "mix.lock" }}
       - run: mix deps.get
+      - run: MIX_ENV=test mix compile --warnings-as-errors
       - run: mix test
       - when:
           condition:
@@ -33,7 +41,7 @@ jobs:
             - run: mix deps.unlock --check-unused
             - run: mix docs
             - run: mix hex.build
-            - run: mix credo -a
+            - run: mix credo -a --strict
             - run: mix dialyzer
       - save_cache:
           key: v1-mix-cache-<< parameters.tag >>-{{ checksum "mix.lock" }}
@@ -44,12 +52,13 @@ jobs:
 workflows:
   checks:
     jobs:
+      - check-license
       - build-test:
           name: << matrix.tag >>
           matrix:
             parameters:
               tag: [
-                1.15.7-erlang-26.1.1-alpine-3.18.3,
+                1.15.7-erlang-26.1.2-alpine-3.18.4,
                 1.14.5-erlang-25.3.2-alpine-3.18.0,
                 1.13.4-erlang-24.3.4.11-alpine-3.18.0,
                 1.12.3-erlang-24.3.4.11-alpine-3.18.0,

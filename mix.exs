@@ -60,7 +60,7 @@ defmodule Fortune.MixProject do
 
   defp package() do
     [
-      files: ["CHANGELOG.md", "lib", "LICENSE", "mix.exs", "README.md"],
+      files: ["CHANGELOG.md", "lib", "LICENSES/*", "mix.exs", "README.md"],
       licenses: ["Apache-2.0"],
       links: %{"Github" => @source_url}
     ]
