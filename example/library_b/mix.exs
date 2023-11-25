@@ -5,7 +5,7 @@ defmodule LibraryB.MixProject do
     [
       app: :library_b,
       version: "0.1.0",
-      elixir: "~> 1.15",
+      elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       compilers: Mix.compilers() ++ [:fortune_compiler],
       deps: deps()
