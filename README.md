@@ -15,18 +15,23 @@ implementation. It is compatible with Unix fortune and can read most Unix
 fortune files.
 
 ```elixir
-iex> Fortune.random()
-{:ok, "Harness the power of the BEAM, one Elixir potion at a time."}
+iex> Fortune.random! |> IO.puts
+Harness the power of the BEAM, one Elixir potion at a time.
+:ok
 ```
 
 No fortunes are provided, though. You'll need to add your own, add Elixir
 libraries to your mix dependencies that have fortunes, or configure Fortune to
 use your system ones.
 
-Here's an example on Mac when you've installed `fortune` via Homebrew:
+An easy way to start is to install the Unix `fortune` program using your package
+manager. If no fortunes are supplied by Elixir libraries, Fortune will consult
+it. You can also force it using the `:include_system_fortunes?` option.
 
 ```elixir
-Fortune.random(include_system_fortunes?: true)
+iex> Fortune.random!(include_system_fortunes?: true) |> IO.puts
+Ignore the next fortune
+:ok
 ```
 
 Fortunes provided by Elixir libraries are stored in that library's
