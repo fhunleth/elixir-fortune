@@ -32,6 +32,7 @@ defmodule Mix.Tasks.Compile.FortuneCompiler do
   @recursive true
 
   @doc false
+  @spec run([String.t()]) :: :ok
   def run(_args) do
     check_priv()
 

@@ -5,12 +5,14 @@ defmodule Fortune.StrfileReader do
   @moduledoc false
   @strfile_max_header_len 44
 
+  @typep strfile() :: %{header: map(), path: String.t(), io: IO.device()}
+
   @spec search_paths([String.t()]) :: [String.t()]
   def search_paths(paths) do
     Enum.flat_map(paths, &scan_for_fortunes/1)
   end
 
-  @spec open(Path.t()) :: {:ok, map()} | {:error, atom()}
+  @spec open(Path.t()) :: {:ok, strfile()} | {:error, atom()}
   def open(path) do
     with {:ok, io} <- open_index(path),
          {:ok, header} <- read_header(io) do
@@ -18,11 +20,13 @@ defmodule Fortune.StrfileReader do
     end
   end
 
+  @spec close(strfile()) :: :ok
   def close(strfile) do
     _ = File.close(strfile.io)
     :ok
   end
 
+  @spec read_string(strfile(), non_neg_integer()) :: {:ok, String.t()} | {:error, atom()}
   def read_string(strfile, index) do
     offset_size = strfile.header.word_size
     offset_size_bits = strfile.header.word_size * 8
@@ -31,14 +35,6 @@ defmodule Fortune.StrfileReader do
            pread(strfile.io, strfile.header.length + index * offset_size, offset_size),
          {:ok, string_and_more} <- pread_file(strfile.path, offset, strfile.header.longest_string) do
       {:ok, trim_string_to_separator(string_and_more, strfile.header.separator)}
-    end
-  end
-
-  def read_info(path) do
-    with {:ok, io} <- open_index(path),
-         {:ok, header} <- read_header(io) do
-      _ = File.close(io)
-      {:ok, header}
     end
   end
 
