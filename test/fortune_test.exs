@@ -16,4 +16,14 @@ defmodule FortuneTest do
       assert_raise RuntimeError, fn -> Fortune.random!(paths: ["/nowhere"]) end
     end
   end
+
+  describe "info/1" do
+    test "info returns expected stats" do
+      {:ok, info} = Fortune.info()
+
+      assert info.num_files == 2
+      assert info.num_fortunes == 16
+      assert Enum.count(info.files) == info.num_files
+    end
+  end
 end

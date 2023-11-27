@@ -64,20 +64,14 @@ defmodule Fortune do
   """
   @spec random(fortune_options) :: {:ok, String.t()} | {:error, atom()}
   def random(options \\ []) do
-    merged_options = Keyword.merge(Application.get_all_env(:fortune), options)
-    strfiles = merged_options |> Finder.fortune_paths() |> open_all()
-
-    if strfiles != [] do
-      num_fortunes =
-        Enum.reduce(strfiles, 0, fn strfile, acc -> acc + strfile.header.num_string end)
+    with {:ok, strfiles} <- open_all_strfiles(options) do
+      num_fortunes = count_fortunes(strfiles)
 
       rand_fortune = :rand.uniform(num_fortunes - 1)
       result = nth_fortune(strfiles, rand_fortune)
 
       Enum.each(strfiles, &StrfileReader.close/1)
       result
-    else
-      {:error, :no_fortunes}
     end
   end
 
@@ -86,6 +80,17 @@ defmodule Fortune do
       nth_fortune(rest, n - strfile.header.num_string)
     else
       StrfileReader.read_string(strfile, n)
+    end
+  end
+
+  defp open_all_strfiles(options) do
+    merged_options = Keyword.merge(Application.get_all_env(:fortune), options)
+    strfiles = merged_options |> Finder.fortune_paths() |> open_all()
+
+    if strfiles != [] do
+      {:ok, strfiles}
+    else
+      {:error, :no_fortunes}
     end
   end
 
@@ -111,5 +116,43 @@ defmodule Fortune do
       {:ok, string} -> string
       {:error, reason} -> raise RuntimeError, "Fortune.random failed with #{reason}"
     end
+  end
+
+  @doc """
+  Return statistics on fortunes
+
+  This can be useful for finding out what fortunes are available. The options are
+  the same as the ones for `random/1`.
+
+  NOTE: The returned map may change in the future which is why it is untyped.
+  """
+  @spec info(fortune_options) :: {:ok, map()} | {:error, atom()}
+  def info(options \\ []) do
+    with {:ok, strfiles} <- open_all_strfiles(options) do
+      num_fortunes = count_fortunes(strfiles)
+      num_files = Enum.count(strfiles)
+
+      files =
+        Enum.reduce(strfiles, %{}, fn strfile, acc ->
+          Map.put(acc, strfile.path, %{
+            num_string: strfile.header.num_string,
+            size: file_size(strfile.path)
+          })
+        end)
+
+      Enum.each(strfiles, &StrfileReader.close/1)
+      {:ok, %{num_fortunes: num_fortunes, num_files: num_files, files: files}}
+    end
+  end
+
+  defp file_size(path) do
+    case File.stat(path) do
+      {:ok, stat} -> stat.size
+      _ -> -1
+    end
+  end
+
+  defp count_fortunes(strfiles) do
+    Enum.reduce(strfiles, 0, fn strfile, acc -> acc + strfile.header.num_string end)
   end
 end
