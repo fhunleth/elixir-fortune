@@ -8,7 +8,7 @@ defmodule Fortune.MixProject do
     [
       app: :fortune,
       version: @version,
-      elixir: "~> 1.11",
+      elixir: "~> 1.13",
       docs: docs(),
       description: description(),
       package: package(),
