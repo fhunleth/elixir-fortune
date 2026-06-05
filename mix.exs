@@ -13,13 +13,18 @@ defmodule Fortune.MixProject do
       description: description(),
       package: package(),
       deps: deps(),
-      dialyzer: dialyzer(),
-      preferred_cli_env: %{
+      dialyzer: dialyzer()
+    ] ++ test_options(Mix.env())
+  end
+
+  def cli() do
+    [
+      preferred_envs: %{
         docs: :docs,
         "hex.publish": :docs,
         "hex.build": :docs
       }
-    ] ++ test_options(Mix.env())
+    ]
   end
 
   def application() do
